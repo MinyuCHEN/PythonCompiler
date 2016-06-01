@@ -54,11 +54,12 @@ import java.io.Reader;
 INVALID_CHARACTER       = "á"|"é"|"í"|"ó"|"ú"|"Á"|"É"|"Í"|"Ó"|"Ú"|"ñ"|"Ñ"|"¿"|"ä"|"ë"|"ï"|"ö"|"ü"|"à"|"è"|"ì"|"ò"|"ù"|\\
 
 /*----------------------------------------------TYPES-------------------------------------*/
-TYPE_NUM                = "int"|"float"|"double"
+TYPE_INT                = "int"
+TYPE_FLOAT              = "float"
 TYPE_CHAR               = "char"
-TYPE_STRING             = "String"
+TYPE_STRING             = "string"
 TYPE_BOOLEAN            = "boolean"
-
+TYPE_LIST               = "list"
 /*----------------------------------------------COMMENTS-------------------------------------*/
 COMMENT                 =  {LINE_COMMENT}|{BLOCK_COMMENT}
 LINE_COMMENT            = \#[^\n\r]*
@@ -92,7 +93,7 @@ L_BRACKET_OP            = "["
 R_BRACKET_OP            = "]"
 L_CURLY_BRACKET_OP      = "{"
 R_CURLY_BRACKET_OP      = "}"
-LIST_OP                 = ":"
+COLON_OP                 = ":"
 SEPARATOR_OP            = ","
 PROPERTY_OP             = "."
 SEMICOLON_OP            = ";"
@@ -100,7 +101,7 @@ TAB_OP                  = [\t]
 
 OPERATOR               = {ARITH_OP}|{COMP_OP}|{ASSIG_OP}|{BIT_OP}|{LOGICAL_OP}|{MEMBERSHIP_OP}|
                         {IDENTITY_OP}|{DELIMITER_OP}|{L_PARENTHESIS_OP}|{R_PARENTHESIS_OP}|{L_BRACKET_OP}|{R_BRACKET_OP}
-                        |{L_CURLY_BRACKET_OP}|{R_CURLY_BRACKET_OP}|{LIST_OP}|{SEPARATOR_OP}|{PROPERTY_OP}|{TAB_OP}|{SEMICOLON_OP}
+                        |{L_CURLY_BRACKET_OP}|{R_CURLY_BRACKET_OP}|{COLON_OP}|{SEPARATOR_OP}|{PROPERTY_OP}|{TAB_OP}|{SEMICOLON_OP}
 
 /*----------------------------------------------KEYWORDS-------------------------------------*/
 KEYWORD                 = "and"|"del"|"from"|"not"|"while"|"as"|"elif"|"global"|"or"|"with"|"assert"|"else"|"if"|"pass"|"yield"|"break"|"except"|"import"|"print"|"class"|"exec"|"in"|"raise"|"continue"|"finally"|"is"|"return"|"def"|"for"|"lambda"|"try"|"end"|"input"
@@ -146,18 +147,55 @@ INVALID_LITERAL         = {INVALID_STR_LIT} | {INVALID_CHAR_LIT} |{NUM_LIT}({EXP
     {COMMENT} {/*IGNORE*/}
     {WHITESPACE} {/*IGNORE*/}
 
+
+    {INVALID_CHARACTER}     { return symbol(sym.ERROR); }
     {SEMICOLON_OP}          { return symbol(sym.SEMICOLON_OP); }
     {ARITH_OP}              { return symbol(sym.ARITH_OP); }
     {L_PARENTHESIS_OP}      { return symbol(sym.L_PARENTHESIS_OP); }
     {R_PARENTHESIS_OP}      { return symbol(sym.R_PARENTHESIS_OP); }
+    {L_BRACKET_OP}          { return symbol(sym.L_BRACKET_OP); }
+    {R_BRACKET_OP}          { return symbol(sym.R_BRACKET_OP); }
+
     {NUM_LIT}               { return symbol(sym.NUM_LIT, new Integer(yytext())); }
+    {STRING_LIT}            { return symbol(sym.STRING_LIT, new String(yytext())); }
+    {CHAR_LIT}              { return symbol(sym.CHAR_LIT, new String(yytext())); }
+    {BOOLEAN_LIT}           { return symbol(sym.BOOLEAN_LIT, new Boolean(yytext())); }
+    "and"                   { return symbol(sym.AND); }
+    "break"                 { return symbol(sym.BREAK); }
+    "class"                 { return symbol(sym.CLASS); }
+    "continue"              { return symbol(sym.CONTINUE); }
+    "def"                   { return symbol(sym.DEF); }
+    "elif"                  { return symbol(sym.ELIF); }
+    "else"                  { return symbol(sym.ELSE); }
+    "except"                { return symbol(sym.EXCEPT); }
+    "finally"               { return symbol(sym.FINALLY); }
+    "for"                   { return symbol(sym.FOR); }
+    "if"                    { return symbol(sym.IF); }
+    "in"                    { return symbol(sym.IN); }
+    "input"                 { return symbol(sym.INPUT); }
+    "is not"                { return symbol(sym.IS_NOT); }
+    "or"                    { return symbol(sym.OR); }
+    "print"                 { return symbol(sym.PRINT); }
+    "return"                { return symbol(sym.RETUNR); }
+    "try"                   { return symbol(sym.TRY); }
+    "while"                 { return symbol(sym.WHILE); }
+    {TYPE_LIST}             { return symbol(sym.TYPE_LIST); }
+    {TYPE_INT}              { return symbol(sym.TYPE_INT); }
+    {TYPE_FLOAT}            { return symbol(sym.TYPE_FLOAT); }
+    {TYPE_CHAR}             { return symbol(sym.TYPE_CHAR); }
+    {TYPE_STRING}           { return symbol(sym.TYPE_STRING); }
+    {TYPE_BOOLEAN}          { return symbol(sym.TYPE_BOOLEAN); }
+    {COMP_OP}               { return symbol(sym.COMP_OP); }
+    {ASSIG_OP}              { return symbol(sym.ASSIG_OP); }
+    {LOGICAL_OP}            { return symbol(sym.LOGICAL_OP); }
+    {PROPERTY_OP}           { return symbol(sym.PROPERTY_OP); }
+    {COLON_OP}              { return symbol(sym.COLON_OP); }
+    {IDENTIFIER}            { return symbol(sym.IDENTIFIER); }
 
 
 
 
 }
-[^]                         { return symbol(sym.error);
-        System.out.println("*** Error lexico ***\n");
-        System.out.println("Caracter ilegal: " + yytext() + " line: " + yyline); }
+[^]                         { return symbol(sym.ERROR); }
 
 

@@ -13,7 +13,7 @@ parser code {:
 
     /* Reporte de error encontrado. */
     public void report_error(String message, Object info) {
-        StringBuilder m = new StringBuilder("Error");
+        StringBuilder m = new StringBuilder("ERROR");
         if (info instanceof java_cup.runtime.Symbol) {
             java_cup.runtime.Symbol s = ((java_cup.runtime.Symbol) info);
             if (s.left >= 0) {
@@ -57,16 +57,16 @@ parser code {:
 
    Terminales que no tienen un valor son listados primero, los terminales que
    tienen un valor como los enteros son listados en la segunda o demas lineas. */
-terminal           SEMICOLON_OP, ARITH_OP, L_PARENTHESIS_OP, R_PARENTHESIS_OP, NUM_LIT;
-//terminal Integer   ENTERO;
+terminal           ERROR, SEMICOLON_OP, ARITH_OP, L_PARENTHESIS_OP, R_PARENTHESIS_OP, NUM_LIT, AND, BREAK, CLASS, CONTINUE, DEF, ELIF, ELSE, EXCEPT, FINALLY, FOR, IF, IN, INPUT, IS_NOT, OR, PRINT, RETUNR, TRY, WHILE, TYPE_LIST, TYPE_INT, TYPE_FLOAT, TYPE_CHAR, TYPE_STRING, TYPE_BOOLEAN, COMP_OP, ASSIG_OP, LOGICAL_OP, PROPERTY_OP, COLON_OP, IDENTIFIER, L_BRACKET_OP, R_BRACKET_OP, BOOLEAN_LIT, CHAR_LIT, STRING_LIT;
+
 
 /* No terminales usados en la seccion gramatical.
 
    Primero se lista los no terminales que tienen un valor Object y despues
    se lista los no terminales que tienen un entero. Un Object se refiere a que
    no tienen tipo, pudiendo ser entero o String. */
-non terminal Object     expr_list, expr_part;
-non terminal Integer    expr, factor, termino;
+non terminal Object     expr_list, expr_part,if_stmt, expr, elif_stmt, var_decl, print_stmt, input_stmt;
+//non terminal Integer    expr, factor, termino;
 
 
 /* -------------Seccion de predencia y asociacion de los terminales----------- */
@@ -116,25 +116,59 @@ non terminal Integer    expr, factor, termino;
    se coloca el sodigo en java para las acciones a tomar al cumplirse una produccion.
 */
 
-   expr_part ::= expr:e
-                  {:
-                    System.out.println(" = " + e);
-                  :}
-                  SEMICOLON_OP
-                 ;
+   expr_part ::= if_stmt
+                  |
+                  var_decl
+                  ;
 
 /* 'expr' puede ser una expresion que inicia por numero entero op_suma expr,
   de esa forma se realiza una suma. Tambien puede ser un numero entero, con esto
   se devuelve el valor del entero. En RESULT se almacena el valor de las acciones,
   y se pasa al siguiente nivel de la gramatica.
 */
+if_stmt    ::= IF expr COLON_OP SEMICOLON_OP
+                    |
+                    IF expr COLON_OP elif_stmt ELSE COLON_OP SEMICOLON_OP
+                    |
+                    IF expr COLON_OP ELSE COLON_OP SEMICOLON_OP
+                    ;
 
-   expr      ::=  expr:e ARITH_OP NUM_LIT:f
-                  {: System.out.print("ACEPT"); :}
+
+elif_stmt   ::= elif_stmt ELIF
+                    |
+                    ELIF
+                    ;
+
+   expr      ::=  expr ARITH_OP NUM_LIT
+                  |
+                  expr COMP_OP NUM_LIT
                   |
                   L_PARENTHESIS_OP expr:e R_PARENTHESIS_OP
-                  {: System.out.print("ACEPT"); :}
                   |
                   NUM_LIT:n
-                  {: System.out.print("ACEPT"); :}
+                  |
                   ;
+
+
+var_decl      ::= TYPE_INT IDENTIFIER SEMICOLON_OP
+                  |
+                  TYPE_FLOAT IDENTIFIER SEMICOLON_OP
+                  |
+                  TYPE_LIST IDENTIFIER SEMICOLON_OP
+                  |
+                  TYPE_STRING IDENTIFIER SEMICOLON_OP
+                  |
+                  TYPE_BOOLEAN IDENTIFIER SEMICOLON_OP
+                  |
+                  TYPE_CHAR IDENTIFIER SEMICOLON_OP
+                  | error {:System.err.println(" Type not specified \n");:}
+                  ;
+
+print_stmt    ::= PRINT STRING_LIT
+                  |
+                  PRINT error {:System.err.println(" Error Print Stmt \n");:}
+                  ;
+
+input_stmt    ::= IDENTIFIER ASSIG_OP L_PARENTHESIS_OP STRING_LIT R_PARENTHESIS_OP;
+
+

@@ -1,1 +1,6 @@
-5
+if ( 5 < 6 ) : elif elif else : ;
+
+if 4 == 4 : else : ;
+casita ;
+casita = input ("casa")
+print "sss"
