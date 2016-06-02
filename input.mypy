@@ -1,6 +1,26 @@
-if ( 5 < 6 ) : elif elif else : ;
-
-if 4 == 4 : else : ;
-casita ;
-casita = input ("casa")
-print "sss"
+if 4==6 :
+  block
+;
+elif a != 1 AND a ==0:
+  block
+;
+elif a <1 :
+  block
+;
+elif b <= 3 :
+  block
+;
+elif c== m :
+  block
+;
+elif k ==4 :
+  block
+;
+else:
+  block
+;
+int ab
+print (a,"aaa",True,'a')
+tesr = input ("casita")
+c = clase()
+a = calse.fun()

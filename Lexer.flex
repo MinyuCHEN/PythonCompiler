@@ -94,14 +94,14 @@ R_BRACKET_OP            = "]"
 L_CURLY_BRACKET_OP      = "{"
 R_CURLY_BRACKET_OP      = "}"
 COLON_OP                 = ":"
-SEPARATOR_OP            = ","
+COMMA            = ","
 PROPERTY_OP             = "."
 SEMICOLON_OP            = ";"
 TAB_OP                  = [\t]
 
 OPERATOR               = {ARITH_OP}|{COMP_OP}|{ASSIG_OP}|{BIT_OP}|{LOGICAL_OP}|{MEMBERSHIP_OP}|
                         {IDENTITY_OP}|{DELIMITER_OP}|{L_PARENTHESIS_OP}|{R_PARENTHESIS_OP}|{L_BRACKET_OP}|{R_BRACKET_OP}
-                        |{L_CURLY_BRACKET_OP}|{R_CURLY_BRACKET_OP}|{COLON_OP}|{SEPARATOR_OP}|{PROPERTY_OP}|{TAB_OP}|{SEMICOLON_OP}
+                        |{L_CURLY_BRACKET_OP}|{R_CURLY_BRACKET_OP}|{COLON_OP}|{COMMA}|{PROPERTY_OP}|{TAB_OP}|{SEMICOLON_OP}
 
 /*----------------------------------------------KEYWORDS-------------------------------------*/
 KEYWORD                 = "and"|"del"|"from"|"not"|"while"|"as"|"elif"|"global"|"or"|"with"|"assert"|"else"|"if"|"pass"|"yield"|"break"|"except"|"import"|"print"|"class"|"exec"|"in"|"raise"|"continue"|"finally"|"is"|"return"|"def"|"for"|"lambda"|"try"|"end"|"input"
@@ -145,6 +145,7 @@ INVALID_LITERAL         = {INVALID_STR_LIT} | {INVALID_CHAR_LIT} |{NUM_LIT}({EXP
 
 <YYINITIAL> {
     {COMMENT} {/*IGNORE*/}
+    {TAB_OP}                { return symbol(sym.TAB_OP); }
     {WHITESPACE} {/*IGNORE*/}
 
 
@@ -179,6 +180,8 @@ INVALID_LITERAL         = {INVALID_STR_LIT} | {INVALID_CHAR_LIT} |{NUM_LIT}({EXP
     "return"                { return symbol(sym.RETUNR); }
     "try"                   { return symbol(sym.TRY); }
     "while"                 { return symbol(sym.WHILE); }
+    "block"                 { return symbol(sym.BLOCK); }
+    "range"                 { return symbol(sym.RANGE); }
     {TYPE_LIST}             { return symbol(sym.TYPE_LIST); }
     {TYPE_INT}              { return symbol(sym.TYPE_INT); }
     {TYPE_FLOAT}            { return symbol(sym.TYPE_FLOAT); }
@@ -191,6 +194,7 @@ INVALID_LITERAL         = {INVALID_STR_LIT} | {INVALID_CHAR_LIT} |{NUM_LIT}({EXP
     {PROPERTY_OP}           { return symbol(sym.PROPERTY_OP); }
     {COLON_OP}              { return symbol(sym.COLON_OP); }
     {IDENTIFIER}            { return symbol(sym.IDENTIFIER); }
+    {COMMA}          { return symbol(sym.COMMA); }
 
 
 
