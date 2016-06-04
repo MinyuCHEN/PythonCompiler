@@ -65,7 +65,7 @@ terminal           ERROR, SEMICOLON_OP, ARITH_OP, L_PARENTHESIS_OP, R_PARENTHESI
    Primero se lista los no terminales que tienen un valor Object y despues
    se lista los no terminales que tienen un entero. Un Object se refiere a que
    no tienen tipo, pudiendo ser entero o String. */
-non terminal Object     expr_list, expr_part,if_stmt, expr, elif_stmt, var_decl, print_stmt, input_stmt,  block_stmt, else_stmt, print_param ,var_assing, par_expr, try_stmt, logic_expr, fun_call_expr;
+non terminal Object     program, fun_stmt, class_stmt , list_var_decl, var_decl, par_var_decl, block_stmt;
 //non terminal Integer    expr, factor, termino;
 
 
@@ -107,113 +107,36 @@ non terminal Object     expr_list, expr_part,if_stmt, expr, elif_stmt, var_decl,
    su procesado.
 */
 
-    expr_list ::= expr_list expr_part
-                  |
-                  expr_part
-                  ;
-/* 'expr_part' se compone de una expr seguida de SEMI, o de una asign seguida de SEMI.
-   asign:a esta estableciendo que a representa al objeto asociado a asign, entre {: :}
-   se coloca el sodigo en java para las acciones a tomar al cumplirse una produccion.
-*/
 
-   expr_part ::= if_stmt {:System.err.println(" Succes if \n");:}
-                  |
-                  var_decl {:System.err.println(" Succes var_dec \n");:}
-                  |
-                  print_stmt {:System.err.println(" Succes print \n");:}
-                  |
-                  input_stmt {:System.err.println(" Succes input \n");:}
-                  |
-                  var_assing {:System.err.println(" Succes assig \n");:}
-                  |
-                  try_stmt {:System.err.println(" Succes try \n");:}
-
-                  ;
-
-/* 'expr' puede ser una expresion que inicia por numero entero op_suma expr,
-  de esa forma se realiza una suma. Tambien puede ser un numero entero, con esto
-  se devuelve el valor del entero. En RESULT se almacena el valor de las acciones,
-  y se pasa al siguiente nivel de la gramatica.
-*/
-
-
-
-
-/*----------------------------------BLOCK STATEMENT----------------------------------*/
-  block_stmt    ::= BLOCK;
-
-
-
-
-/*----------------------------------EXPRESSION STATEMENT----------------------------------*/
-
-  expr          ::= expr ARITH_OP logic_expr
+  /*----------------------------------PROGRAM STATEMEN----------------------------------*/
+  program        ::= fun_stmt
                     |
-                    expr ASSIG_OP logic_expr
-                    |
-                    logic_expr
+                    class
                     ;
 
-  logic_expr    ::= logic_expr COMP_OP par_expr
+  /*----------------------------------FUN STATEMEN----------------------------------*/
+  list_fun_stmt ::= list_fun_stmt fun_stmt
                     |
-                    logic_expr LOGICAL_OP par_expr
-                    |
-                    par_expr
+                    fun_stmt
+                    ;
+
+  fun_stmt      ::= DEF IDENTIFIER L_PARENTHESIS_OP par_var_decl R_PARENTHESIS_OP COLON_OP list_var_decl BLOCK SEMICOLON_OP
+                    ;
+
+  /*----------------------------------FUN STATEMEN----------------------------------*/
+  class_stmt    ::= CLASS IDENTIFIER COLON_OP list_var_decl
                     ;
 
 
-  par_expr      ::= L_PARENTHESIS_OP expr R_PARENTHESIS_OP
+  /*----------------------------------VARIABLE DECLARATION----------------------------------*/
+  par_var_decl  ::=list_var_decl COMMA var_decl
                     |
-                    NUM_LIT
-                    |
-                    IDENTIFIER
-                    |
-                    fun_call_expr
+                    var_decl
                     ;
-
-  fun_call_expr ::= par_expr L_PARENTHESIS_OP R_PARENTHESIS_OP
+  list_var_decl ::= list_var_decl var_decl
                     |
-                    par_expr PROPERTY_OP IDENTIFIER L_PARENTHESIS_OP R_PARENTHESIS_OP
+                    var_decl
                     ;
-
-/*----------------------------------PRINT STATEMENT----------------------------------*/
-  print_stmt    ::= PRINT L_PARENTHESIS_OP print_param R_PARENTHESIS_OP
-                    |
-                    PRINT error {:System.err.println(" Error Print Stmt!! \n");:}
-                    ;
-  print_param   ::= print_param COMMA IDENTIFIER
-                    |
-                    print_param COMMA STRING_LIT
-                    |
-                    print_param COMMA NUM_LIT
-                    |
-                    print_param COMMA CHAR_LIT
-                    |
-                    print_param COMMA BOOLEAN_LIT
-                    |
-                    print_param error {:System.err.println(" Error Print Parameter!! \n");:}
-                    |
-                    IDENTIFIER
-                    |
-                    STRING_LIT
-                    |
-                    NUM_LIT
-                    |
-                    CHAR_LIT
-                    |
-                    BOOLEAN_LIT
-                    ;
-
-
-/*----------------------------------INPUT STATEMENT----------------------------------*/
-  input_stmt    ::= IDENTIFIER ASSIG_OP INPUT L_PARENTHESIS_OP STRING_LIT R_PARENTHESIS_OP
-                    | error {:System.err.println(" Error Input Stmt!! \n");:} INPUT L_PARENTHESIS_OP STRING_LIT R_PARENTHESIS_OP
-                    |
-                    IDENTIFIER ASSIG_OP INPUT error {:System.err.println(" Error Input Stmt!! \n");:}
-                    ;
-
-
-/*----------------------------------VARIABLE DECLARATION----------------------------------*/
   var_decl      ::= TYPE_INT IDENTIFIER
                     |
                     TYPE_FLOAT IDENTIFIER
@@ -227,46 +150,5 @@ non terminal Object     expr_list, expr_part,if_stmt, expr, elif_stmt, var_decl,
                     TYPE_CHAR IDENTIFIER
                     | error {:System.err.println(" Type not specified!! \n");:} IDENTIFIER
                     ;
-/*----------------------------------VARIABLE ASSIGN----------------------------------*/
-  var_assing    ::= IDENTIFIER ASSIG_OP expr
 
-
-                    ;
-
-/*------------------------------------------CONTROL STRUCTURES------------------------------------------*/
-
-/*----------------------------------IF STATEMENT----------------------------------*/
-  if_stmt       ::= IF logic_expr COLON_OP block_stmt SEMICOLON_OP
-                    |
-                    IF logic_expr COLON_OP block_stmt SEMICOLON_OP elif_stmt else_stmt
-                    |
-                    IF logic_expr COLON_OP block_stmt SEMICOLON_OP else_stmt
-                    |
-                    IF logic_expr error {:System.err.println(" Error IF Stmt!! \n");:}
-                    ;
-
-/*----------------------------------ELIF STATEMENT----------------------------------*/
-  elif_stmt     ::= elif_stmt ELIF logic_expr COLON_OP block_stmt SEMICOLON_OP
-                    |
-                    ELIF logic_expr COLON_OP block_stmt SEMICOLON_OP
-                    |
-                    ELIF logic_expr error {:System.err.println(" Error ELIF Stmt!! \n");:}
-                    ;
-
-/*----------------------------------ELSE STATEMENT----------------------------------*/
-
-  else_stmt     ::= ELSE COLON_OP block_stmt SEMICOLON_OP
-                    |
-                    ELSE error {:System.err.println(" Error ELSE Stmt!! \n");:}
-                    ;
-
-
-/*----------------------------------TRY STATEMENT----------------------------------*/
-
-  try_stmt      ::= TRY COLON_OP BLOCK SEMICOLON_OP EXCEPT IDENTIFIER COLON_OP BLOCK SEMICOLON_OP
-                    |
-                    TRY COLON_OP BLOCK SEMICOLON_OP EXCEPT IDENTIFIER COLON_OP BLOCK SEMICOLON_OP FINALLY COLON_OP BLOCK SEMICOLON_OP
-                    ;
-
-/*----------------------------------WHILE STATEMENT----------------------------------*/
-
+  block_stmt    ::= BLOCK;

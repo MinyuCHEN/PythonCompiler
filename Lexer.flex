@@ -194,7 +194,7 @@ INVALID_LITERAL         = {INVALID_STR_LIT} | {INVALID_CHAR_LIT} |{NUM_LIT}({EXP
     {PROPERTY_OP}           { return symbol(sym.PROPERTY_OP); }
     {COLON_OP}              { return symbol(sym.COLON_OP); }
     {IDENTIFIER}            { return symbol(sym.IDENTIFIER); }
-    {COMMA}          { return symbol(sym.COMMA); }
+    {COMMA}                 { return symbol(sym.COMMA); }
 
 
 

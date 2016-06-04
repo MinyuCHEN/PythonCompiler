@@ -1,26 +1,6 @@
-if 4==6 :
+def miFun (int a, string c) :
+  int a
+  string c
+  char ht
   block
-;
-elif a != 1 AND a ==0:
-  block
-;
-elif a <1 :
-  block
-;
-elif b <= 3 :
-  block
-;
-elif c== m :
-  block
-;
-elif k ==4 :
-  block
-;
-else:
-  block
-;
-int ab
-print (a,"aaa",True,'a')
-tesr = input ("casita")
-c = clase()
-a = calse.fun()
+

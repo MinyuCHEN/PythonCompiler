@@ -1,0 +1,287 @@
+
+
+/* ---------------Seccion de declaraciones preliminares--------------------*/
+package pythoncompiler;
+
+/* Import the class java_cup.runtime.*  */
+import java_cup.runtime.*;
+import java.io.FileReader;
+
+/* Codigo del parser, se copia integramente a la clase final.
+    Agregamos el manejo de errores. */
+parser code {:
+
+    /* Reporte de error encontrado. */
+    public void report_error(String message, Object info) {
+        StringBuilder m = new StringBuilder("ERROR");
+        if (info instanceof java_cup.runtime.Symbol) {
+            java_cup.runtime.Symbol s = ((java_cup.runtime.Symbol) info);
+            if (s.left >= 0) {
+                m.append(" in line "+(s.left+1));
+                if (s.right >= 0)
+                    m.append(", column "+(s.right+1));
+            }
+        }
+        m.append(" : "+message);
+        System.err.println(m);
+    }
+
+    /* Cuando se encuentra un error de donde el sistema no puede
+        recuperarse, se lanza un error fatal. Se despliega el mensaje
+        de error y se finaliza la ejecucion. */
+    public void report_fatal_error(String message, Object info) {
+        report_error(message, info);
+        System.exit(1);
+    }
+
+    /* Metodo main para garantizar la ejecucion del analizador
+       lexico y sintactico, ademas que se pase como parametro la tabla
+       de simbolos correspondiente. */
+    public static void main(String[] args){
+        try {
+            Parser asin = new Parser(
+                    new Lexer( new FileReader(args[0])));
+            Object result = asin.parse().value;
+            System.out.println("\n*** Resultados finales ***");
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+    }
+:};
+
+
+
+/* ------------Declaracion de simbolos terminales y no terminales---------- */
+
+/* Terminales (tokens obtenidos por el analizador lexico).
+
+   Terminales que no tienen un valor son listados primero, los terminales que
+   tienen un valor como los enteros son listados en la segunda o demas lineas. */
+terminal           ERROR, SEMICOLON_OP, ARITH_OP, L_PARENTHESIS_OP, R_PARENTHESIS_OP, NUM_LIT, AND, BREAK, CLASS, CONTINUE, DEF, ELIF, ELSE, EXCEPT, FINALLY, FOR, IF, IN, INPUT, IS_NOT, OR, PRINT, RETUNR, TRY, WHILE, TYPE_LIST, TYPE_INT, TYPE_FLOAT, TYPE_CHAR, TYPE_STRING, TYPE_BOOLEAN, COMP_OP, ASSIG_OP, LOGICAL_OP, PROPERTY_OP, COLON_OP, IDENTIFIER, L_BRACKET_OP, R_BRACKET_OP, BOOLEAN_LIT, CHAR_LIT, STRING_LIT, BLOCK, TAB_OP, COMMA, RANGE;
+
+
+/* No terminales usados en la seccion gramatical.
+
+   Primero se lista los no terminales que tienen un valor Object y despues
+   se lista los no terminales que tienen un entero. Un Object se refiere a que
+   no tienen tipo, pudiendo ser entero o String. */
+non terminal Object     expr_list, expr_part,if_stmt, expr, elif_stmt, var_decl, print_stmt, input_stmt,  block_stmt, else_stmt, print_param ,var_assing, par_expr, try_stmt, logic_expr, fun_call_expr, while_stmt, for_stmt;
+//non terminal Integer    expr, factor, termino;
+
+
+/* -------------Seccion de predencia y asociacion de los terminales----------- */
+
+/*
+  Precedencia de los no terminales, no sirve con simbolos terminales.
+  Por eso no la usamos. Además indica si se asocia a izquierda o derecha.
+*/
+  /*precedence left OP_SUMA, OP_RESTA;
+  precedence left OP_MULT;*/
+
+
+/* ------------------- Seccion de la gramatica ------------------------ */
+
+/* La gramatica de nuestro analizador.
+
+   expr_list ::=   expr_list expr_part
+                 | expr_part
+   expr_part ::=   expr SEMI
+   expr      ::=   expr PLUS factor
+                 | expr MINUS factor
+                 | factor
+   factor    ::=   factor TIMES term
+                 | factor DIVIDE term
+                 | term
+   term     ::=    LPAREN expr RPAREN
+                 | NUMBER
+                 | ID
+*/
+
+/* 'expr_list' es la raiz de la gramatica. Una 'expr_list' puede ser una 'expr_list'
+   seguida de una expr_part, o puede ser una expr_part.
+   Un terminal o no terminal se define <termino> ::= termino1 termino2 ... terminoN.;
+   donde termino puede ser terminal o no terminal, solo se permite un simbolo a la
+   izquierda. La | sirve para indicar que es una produccion u otra.
+   Debemos pasar de simbolos no terminales a simbolos terminales. Una gramatica que no
+   termina en simbolos terminales se dice que no reduce, y por lo tanto nunca se finaliza
+   su procesado.
+*/
+
+    expr_list ::= expr_list expr_part
+                  |
+                  expr_part
+                  ;
+/* 'expr_part' se compone de una expr seguida de SEMI, o de una asign seguida de SEMI.
+   asign:a esta estableciendo que a representa al objeto asociado a asign, entre {: :}
+   se coloca el sodigo en java para las acciones a tomar al cumplirse una produccion.
+*/
+
+   expr_part ::= if_stmt {:System.err.println(" Succes if \n");:}
+                  |
+                  var_decl {:System.err.println(" Succes var_dec \n");:}
+                  |
+                  print_stmt {:System.err.println(" Succes print \n");:}
+                  |
+                  input_stmt {:System.err.println(" Succes input \n");:}
+                  |
+                  var_assing {:System.err.println(" Succes assig \n");:}
+                  |
+                  try_stmt {:System.err.println(" Succes try \n");:}
+                  |
+                  while_stmt {:System.err.println(" Succes while \n");:}
+                  |
+                  for_stmt {:System.err.println(" Succes for \n");:}
+
+                  ;
+
+/* 'expr' puede ser una expresion que inicia por numero entero op_suma expr,
+  de esa forma se realiza una suma. Tambien puede ser un numero entero, con esto
+  se devuelve el valor del entero. En RESULT se almacena el valor de las acciones,
+  y se pasa al siguiente nivel de la gramatica.
+*/
+
+
+
+
+/*----------------------------------BLOCK STATEMENT----------------------------------*/
+  block_stmt    ::= BLOCK;
+
+
+
+
+/*----------------------------------EXPRESSION STATEMENT----------------------------------*/
+
+  expr          ::= expr ARITH_OP logic_expr
+                    |
+                    expr ASSIG_OP logic_expr
+                    |
+                    logic_expr
+                    ;
+
+  logic_expr    ::= logic_expr COMP_OP par_expr
+                    |
+                    logic_expr LOGICAL_OP par_expr
+                    |
+                    par_expr
+                    ;
+
+
+  par_expr      ::= L_PARENTHESIS_OP expr R_PARENTHESIS_OP
+                    |
+                    NUM_LIT
+                    |
+                    IDENTIFIER
+                    |
+                    fun_call_expr
+                    ;
+
+  fun_call_expr ::= par_expr L_PARENTHESIS_OP R_PARENTHESIS_OP
+                    |
+                    par_expr PROPERTY_OP IDENTIFIER L_PARENTHESIS_OP R_PARENTHESIS_OP
+                    ;
+
+/*----------------------------------PRINT STATEMENT----------------------------------*/
+  print_stmt    ::= PRINT L_PARENTHESIS_OP print_param R_PARENTHESIS_OP
+                    |
+                    PRINT error {:System.err.println(" Error Print Stmt!! \n");:}
+                    ;
+  print_param   ::= print_param COMMA IDENTIFIER
+                    |
+                    print_param COMMA STRING_LIT
+                    |
+                    print_param COMMA NUM_LIT
+                    |
+                    print_param COMMA CHAR_LIT
+                    |
+                    print_param COMMA BOOLEAN_LIT
+                    |
+                    print_param error {:System.err.println(" Error Print Parameter!! \n");:}
+                    |
+                    IDENTIFIER
+                    |
+                    STRING_LIT
+                    |
+                    NUM_LIT
+                    |
+                    CHAR_LIT
+                    |
+                    BOOLEAN_LIT
+                    ;
+
+
+/*----------------------------------INPUT STATEMENT----------------------------------*/
+  input_stmt    ::= IDENTIFIER ASSIG_OP INPUT L_PARENTHESIS_OP STRING_LIT R_PARENTHESIS_OP
+                    | error {:System.err.println(" Error Input Stmt!! \n");:} INPUT L_PARENTHESIS_OP STRING_LIT R_PARENTHESIS_OP
+                    |
+                    IDENTIFIER ASSIG_OP INPUT error {:System.err.println(" Error Input Stmt!! \n");:}
+                    ;
+
+
+/*----------------------------------VARIABLE DECLARATION----------------------------------*/
+  var_decl      ::= TYPE_INT IDENTIFIER
+                    |
+                    TYPE_FLOAT IDENTIFIER
+                    |
+                    TYPE_LIST IDENTIFIER
+                    |
+                    TYPE_STRING IDENTIFIER
+                    |
+                    TYPE_BOOLEAN IDENTIFIER
+                    |
+                    TYPE_CHAR IDENTIFIER
+                    | error {:System.err.println(" Type not specified!! \n");:} IDENTIFIER
+                    ;
+/*----------------------------------VARIABLE ASSIGN----------------------------------*/
+  var_assing    ::= IDENTIFIER ASSIG_OP expr
+
+
+                    ;
+
+/*------------------------------------------CONTROL STRUCTURES------------------------------------------*/
+
+/*----------------------------------IF STATEMENT----------------------------------*/
+  if_stmt       ::= IF logic_expr COLON_OP block_stmt SEMICOLON_OP
+                    |
+                    IF logic_expr COLON_OP block_stmt SEMICOLON_OP elif_stmt else_stmt
+                    |
+                    IF logic_expr COLON_OP block_stmt SEMICOLON_OP else_stmt
+                    |
+                    IF logic_expr error {:System.err.println(" Error IF Stmt!! \n");:}
+                    ;
+
+/*----------------------------------ELIF STATEMENT----------------------------------*/
+  elif_stmt     ::= elif_stmt ELIF logic_expr COLON_OP block_stmt SEMICOLON_OP
+                    |
+                    ELIF logic_expr COLON_OP block_stmt SEMICOLON_OP
+                    |
+                    ELIF logic_expr error {:System.err.println(" Error ELIF Stmt!! \n");:}
+                    ;
+
+/*----------------------------------ELSE STATEMENT----------------------------------*/
+
+  else_stmt     ::= ELSE COLON_OP block_stmt SEMICOLON_OP
+                    |
+                    ELSE error {:System.err.println(" Error ELSE Stmt!! \n");:}
+                    ;
+
+
+/*----------------------------------TRY STATEMENT----------------------------------*/
+
+  try_stmt      ::= TRY COLON_OP BLOCK SEMICOLON_OP EXCEPT IDENTIFIER COLON_OP BLOCK SEMICOLON_OP
+                    |
+                    TRY COLON_OP BLOCK SEMICOLON_OP EXCEPT IDENTIFIER COLON_OP BLOCK SEMICOLON_OP FINALLY COLON_OP BLOCK SEMICOLON_OP
+                    ;
+
+/*----------------------------------WHILE STATEMENT----------------------------------*/
+
+  while_stmt    ::= WHILE logic_expr COLON_OP BLOCK SEMICOLON_OP
+                    |
+                    WHILE error {:System.err.println(" Error WHILE Stmt!! \n");:}
+                    ;
+
+  for_stmt      ::= FOR logic_expr IN RANGE logic_expr COLON_OP BLOCK SEMICOLON_OP
+                    |
+                    FOR logic_expr IN logic_expr COLON_OP BLOCK SEMICOLON_OP
+                    |
+                    FOR error {:System.err.println(" Error FOR Stmt!! \n");:}
+                    ;
