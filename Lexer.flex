@@ -180,7 +180,6 @@ INVALID_LITERAL         = {INVALID_STR_LIT} | {INVALID_CHAR_LIT} |{NUM_LIT}({EXP
     "return"                { return symbol(sym.RETUNR); }
     "try"                   { return symbol(sym.TRY); }
     "while"                 { return symbol(sym.WHILE); }
-    "block"                 { return symbol(sym.BLOCK); }
     "range"                 { return symbol(sym.RANGE); }
     {TYPE_LIST}             { return symbol(sym.TYPE_LIST); }
     {TYPE_INT}              { return symbol(sym.TYPE_INT); }

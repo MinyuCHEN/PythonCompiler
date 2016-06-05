@@ -57,7 +57,7 @@ parser code {:
 
    Terminales que no tienen un valor son listados primero, los terminales que
    tienen un valor como los enteros son listados en la segunda o demas lineas. */
-terminal           ERROR, SEMICOLON_OP, ARITH_OP, L_PARENTHESIS_OP, R_PARENTHESIS_OP, NUM_LIT, AND, BREAK, CLASS, CONTINUE, DEF, ELIF, ELSE, EXCEPT, FINALLY, FOR, IF, IN, INPUT, IS_NOT, OR, PRINT, RETUNR, TRY, WHILE, TYPE_LIST, TYPE_INT, TYPE_FLOAT, TYPE_CHAR, TYPE_STRING, TYPE_BOOLEAN, COMP_OP, ASSIG_OP, LOGICAL_OP, PROPERTY_OP, COLON_OP, IDENTIFIER, L_BRACKET_OP, R_BRACKET_OP, BOOLEAN_LIT, CHAR_LIT, STRING_LIT, BLOCK, TAB_OP, COMMA, RANGE;
+terminal           ERROR, SEMICOLON_OP, ARITH_OP, L_PARENTHESIS_OP, R_PARENTHESIS_OP, NUM_LIT, AND, BREAK, CLASS, CONTINUE, DEF, ELIF, ELSE, EXCEPT, FINALLY, FOR, IF, IN, INPUT, IS_NOT, OR, PRINT, RETUNR, TRY, WHILE, TYPE_LIST, TYPE_INT, TYPE_FLOAT, TYPE_CHAR, TYPE_STRING, TYPE_BOOLEAN, COMP_OP, ASSIG_OP, LOGICAL_OP, PROPERTY_OP, COLON_OP, IDENTIFIER, L_BRACKET_OP, R_BRACKET_OP, BOOLEAN_LIT, CHAR_LIT, STRING_LIT, TAB_OP, COMMA, RANGE;
 
 
 /* No terminales usados en la seccion gramatical.
@@ -65,7 +65,7 @@ terminal           ERROR, SEMICOLON_OP, ARITH_OP, L_PARENTHESIS_OP, R_PARENTHESI
    Primero se lista los no terminales que tienen un valor Object y despues
    se lista los no terminales que tienen un entero. Un Object se refiere a que
    no tienen tipo, pudiendo ser entero o String. */
-non terminal Object     program, fun_stmt, class_stmt , list_var_decl, var_decl, par_var_decl, block_stmt;
+non terminal Object     program, def_func_stmt,  fun_stmt, fun_stmt2, class_stmt , list_var_decl, var_decl, func_par, block_stmt, list_block_stmt, if_stmt, elif_stmt, else_stmt, if_loop_stmt, elif_loop_stmt, else_loop_stmt, try_stmt, while_stmt, for_stmt, logic_expr, min_expr, var_assing, list_var_assig, call_func_expr, call_func_expr2, par_expr, expr, arith_expr, list_arg, print_stmt, input_stmt, range_stmt, range_values, list_loop_block_stmt, loop_block_stmt;
 //non terminal Integer    expr, factor, termino;
 
 
@@ -109,34 +109,78 @@ non terminal Object     program, fun_stmt, class_stmt , list_var_decl, var_decl,
 
 
   /*----------------------------------PROGRAM STATEMEN----------------------------------*/
-  program        ::= fun_stmt
+  program       ::= class_stmt {:System.err.println(" Parser Completed!! \n");:} def_func_stmt
                     |
-                    class
+                    class_stmt {:System.err.println(" Parser Completed!! Only class in the program \n");:}
+                    |
+                    def_func_stmt {:System.err.println(" Parser Completed!!  \n");:}
                     ;
 
-  /*----------------------------------FUN STATEMEN----------------------------------*/
-  list_fun_stmt ::= list_fun_stmt fun_stmt
+  /*----------------------------------CLASS STATEMEN----------------------------------*/
+  class_stmt    ::= CLASS IDENTIFIER COLON_OP list_var_decl list_var_assig def_func_stmt SEMICOLON_OP
+                    |
+                    CLASS IDENTIFIER COLON_OP list_var_decl list_var_assig SEMICOLON_OP
+                    |
+                    CLASS IDENTIFIER COLON_OP list_var_decl def_func_stmt SEMICOLON_OP
+                    |
+                    CLASS IDENTIFIER COLON_OP list_var_decl SEMICOLON_OP
+                    |
+                    CLASS IDENTIFIER COLON_OP list_var_assig def_func_stmt SEMICOLON_OP
+                    |
+                    CLASS IDENTIFIER COLON_OP list_var_assig SEMICOLON_OP
+                    |
+                    CLASS IDENTIFIER COLON_OP def_func_stmt SEMICOLON_OP
+                    |
+                    CLASS IDENTIFIER COLON_OP SEMICOLON_OP
+                    ;
+
+
+  /*----------------------------------FUNCTION STATEMEN----------------------------------*/
+  def_func_stmt ::= def_func_stmt fun_stmt
                     |
                     fun_stmt
                     ;
 
-  fun_stmt      ::= DEF IDENTIFIER L_PARENTHESIS_OP par_var_decl R_PARENTHESIS_OP COLON_OP list_var_decl BLOCK SEMICOLON_OP
+  fun_stmt      ::= DEF IDENTIFIER L_PARENTHESIS_OP fun_stmt2 COLON_OP list_var_decl list_block_stmt SEMICOLON_OP
+                    |
+                    DEF IDENTIFIER L_PARENTHESIS_OP fun_stmt2 COLON_OP list_var_decl SEMICOLON_OP
+                    |
+                    DEF IDENTIFIER L_PARENTHESIS_OP fun_stmt2 COLON_OP list_block_stmt SEMICOLON_OP
+                    |
+                    DEF IDENTIFIER L_PARENTHESIS_OP fun_stmt2 COLON_OP SEMICOLON_OP
+                    ;
+  fun_stmt2     ::= func_par R_PARENTHESIS_OP
+                    |
+                    R_PARENTHESIS_OP
                     ;
 
-  /*----------------------------------FUN STATEMEN----------------------------------*/
-  class_stmt    ::= CLASS IDENTIFIER COLON_OP list_var_decl
+  /*----------------------------------FUNCTION PARAMETER----------------------------------*/
+
+  func_par      ::= func_par COMMA list_var_decl
+                    |
+                    list_var_decl
                     ;
 
+  /*----------------------------------VARIABLE ASSIGNATION----------------------------------*/
+
+  list_var_assig::= list_var_assig var_assing
+                    |
+                    var_assing
+                    ;
+
+  var_assing    ::= IDENTIFIER ASSIG_OP expr
+                    |
+                    IDENTIFIER error {:System.err.println(" Missing : = on Variable assig  \n");:} expr
+                    ;
 
   /*----------------------------------VARIABLE DECLARATION----------------------------------*/
-  par_var_decl  ::=list_var_decl COMMA var_decl
-                    |
-                    var_decl
-                    ;
+
+
   list_var_decl ::= list_var_decl var_decl
                     |
                     var_decl
                     ;
+
   var_decl      ::= TYPE_INT IDENTIFIER
                     |
                     TYPE_FLOAT IDENTIFIER
@@ -151,4 +195,212 @@ non terminal Object     program, fun_stmt, class_stmt , list_var_decl, var_decl,
                     | error {:System.err.println(" Type not specified!! \n");:} IDENTIFIER
                     ;
 
-  block_stmt    ::= BLOCK;
+  /*----------------------------------EXPRESSION STATEMEN----------------------------------*/
+  expr          ::= arith_expr
+                    |
+                    call_func_expr
+                    ;
+
+  arith_expr    ::= expr ARITH_OP logic_expr
+                    |
+                    expr ASSIG_OP logic_expr
+                    |
+                    logic_expr
+                    ;
+
+  logic_expr    ::= logic_expr COMP_OP min_expr
+                    |
+                    logic_expr LOGICAL_OP min_expr
+                    |
+                    par_expr
+                    ;
+
+  par_expr      ::= L_PARENTHESIS_OP arith_expr R_PARENTHESIS_OP
+                    |
+                    min_expr;
+
+  min_expr      ::= IDENTIFIER
+                    |
+                    NUM_LIT
+                    |
+                    STRING_LIT
+                    |
+                    CHAR_LIT
+                    |
+                    BOOLEAN_LIT
+                    ;
+
+
+call_func_expr  ::= IDENTIFIER L_PARENTHESIS_OP call_func_expr2
+                    |
+                    IDENTIFIER PROPERTY_OP IDENTIFIER L_PARENTHESIS_OP call_func_expr2
+                    ;
+
+call_func_expr2 ::= list_arg R_PARENTHESIS_OP
+                    |
+                    R_PARENTHESIS_OP
+                    ;
+
+  /*----------------------------------ARGUMENT LIST STATEMEN----------------------------------*/
+
+  list_arg      ::= list_arg COMMA expr
+                    |
+                    expr
+                    ;
+
+
+/*------------------------------------------CONTROL STRUCTURES------------------------------------------*/
+
+/*----------------------------------IF LOOP STATEMENT----------------------------------*/
+if_loop_stmt    ::= IF logic_expr COLON_OP list_loop_block_stmt SEMICOLON_OP
+                    |
+                    IF logic_expr COLON_OP list_loop_block_stmt SEMICOLON_OP elif_loop_stmt else_loop_stmt
+                    |
+                    IF logic_expr COLON_OP list_loop_block_stmt SEMICOLON_OP else_loop_stmt
+                    |
+                    IF logic_expr error {:System.err.list_loop_block_stmt(" Error IF Stmt!! \n");:}
+                    ;
+
+/*----------------------------------ELIF LOOP STATEMENT----------------------------------*/
+  elif_loop_stmt     ::= elif_loop_stmt ELIF logic_expr COLON_OP list_loop_block_stmt SEMICOLON_OP
+                    |
+                    ELIF logic_expr COLON_OP list_loop_block_stmt SEMICOLON_OP
+                    |
+                    ELIF logic_expr error {:System.err.println(" Error ELIF Stmt!! \n");:}
+                    ;
+
+/*----------------------------------ELSE LOOP STATEMENT----------------------------------*/
+
+  else_loop_stmt     ::= ELSE COLON_OP list_loop_block_stmt SEMICOLON_OP
+                    |
+                    ELSE error {:System.err.println(" Error ELSE Stmt!! \n");:}
+                    ;
+
+
+/*----------------------------------IF STATEMENT----------------------------------*/
+  if_stmt       ::= IF logic_expr COLON_OP list_block_stmt SEMICOLON_OP
+                    |
+                    IF logic_expr COLON_OP list_block_stmt SEMICOLON_OP elif_stmt else_stmt
+                    |
+                    IF logic_expr COLON_OP list_block_stmt SEMICOLON_OP else_stmt
+                    |
+                    IF logic_expr error {:System.err.println(" Error IF Stmt!! \n");:}
+                    ;
+
+/*----------------------------------ELIF STATEMENT----------------------------------*/
+  elif_stmt     ::= elif_stmt ELIF logic_expr COLON_OP list_block_stmt SEMICOLON_OP
+                    |
+                    ELIF logic_expr COLON_OP list_block_stmt SEMICOLON_OP
+                    |
+                    ELIF logic_expr error {:System.err.println(" Error ELIF Stmt!! \n");:}
+                    ;
+
+/*----------------------------------ELSE STATEMENT----------------------------------*/
+
+  else_stmt     ::= ELSE COLON_OP list_block_stmt SEMICOLON_OP
+                    |
+                    ELSE error {:System.err.println(" Error ELSE Stmt!! \n");:}
+                    ;
+
+
+/*----------------------------------TRY STATEMENT----------------------------------*/
+
+  try_stmt      ::= TRY COLON_OP list_block_stmt SEMICOLON_OP EXCEPT IDENTIFIER COLON_OP list_block_stmt SEMICOLON_OP
+                    |
+                    TRY COLON_OP list_block_stmt SEMICOLON_OP EXCEPT IDENTIFIER COLON_OP list_block_stmt SEMICOLON_OP FINALLY COLON_OP list_block_stmt SEMICOLON_OP
+                    ;
+
+/*----------------------------------WHILE STATEMENT----------------------------------*/
+
+  while_stmt    ::= WHILE logic_expr COLON_OP list_loop_block_stmt SEMICOLON_OP
+                    |
+                    WHILE error {:System.err.println(" Error WHILE Stmt!! \n");:}
+                    ;
+/*----------------------------------FOR STATEMENT----------------------------------*/
+  for_stmt      ::= FOR IDENTIFIER IN range_stmt  COLON_OP list_loop_block_stmt SEMICOLON_OP
+                    |
+                    FOR IDENTIFIER IN IDENTIFIER COLON_OP list_loop_block_stmt SEMICOLON_OP
+                    |
+                    FOR IDENTIFIER IN STRING_LIT COLON_OP list_loop_block_stmt SEMICOLON_OP
+                    |
+                    FOR error {:System.err.println(" Error FOR Stmt!! \n");:}
+                    ;
+
+  range_stmt    ::= RANGE L_PARENTHESIS_OP range_values R_PARENTHESIS_OP
+                    |
+                    RANGE L_PARENTHESIS_OP range_values COMMA range_values R_PARENTHESIS_OP
+                    |
+                    RANGE L_PARENTHESIS_OP range_values COMMA range_values COMMA range_values R_PARENTHESIS_OP
+                    |
+                    RANGE L_PARENTHESIS_OP error {:System.err.println(" Error RANGE Stmt!! \n");:} R_PARENTHESIS_OP
+                    ;
+  range_values  ::= IDENTIFIER
+                    |
+                    NUM_LIT
+                    ;
+
+/*----------------------------------PRINT STATEMENT----------------------------------*/
+  print_stmt    ::= PRINT L_PARENTHESIS_OP list_arg R_PARENTHESIS_OP
+                    |
+                    PRINT error {:System.err.println(" Error Print Stmt!! \n");:}
+                    ;
+
+/*----------------------------------INPUT STATEMENT----------------------------------*/
+  input_stmt    ::= IDENTIFIER ASSIG_OP INPUT L_PARENTHESIS_OP STRING_LIT R_PARENTHESIS_OP{:System.err.println("  Input Stmt!! \n");:}
+                    |
+                    error {:System.err.println(" Error Input Stmt!! \n");:} INPUT L_PARENTHESIS_OP STRING_LIT R_PARENTHESIS_OP
+                    |
+                    IDENTIFIER ASSIG_OP INPUT error {:System.err.println(" Error Input Stmt!! \n");:}
+                    ;
+
+
+/*----------------------------------BLOCK STATEMENT----------------------------------*/
+  list_block_stmt::= list_block_stmt block_stmt
+                    |
+                    block_stmt
+                    ;
+  list_loop_block_stmt ::= list_loop_block_stmt loop_block_stmt
+                            |
+                            loop_block_stmt
+                            ;
+
+  loop_block_stmt::= BREAK
+                    |
+                    CONTINUE
+                    |
+                    if_loop_stmt
+                    |
+                    try_stmt
+                    |
+                    while_stmt
+                    |
+                    for_stmt
+                    |
+                    call_func_expr
+                    |
+                    var_assing
+                    |
+                    print_stmt
+                    |
+                    input_stmt
+
+                    ;
+
+  block_stmt    ::= if_stmt
+                    |
+                    try_stmt
+                    |
+                    while_stmt
+                    |
+                    for_stmt
+                    |
+                    call_func_expr
+                    |
+                    var_assing
+                    |
+                    print_stmt
+                    |
+                    input_stmt
+                    ;
+
+
