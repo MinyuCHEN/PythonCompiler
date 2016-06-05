@@ -228,6 +228,8 @@ non terminal Object     program, def_func_stmt,  fun_stmt, fun_stmt2, class_stmt
                     CHAR_LIT
                     |
                     BOOLEAN_LIT
+                    |
+                    error {:System.err.println(" Error EXPRESSION!! \n");:}
                     ;
 
 
@@ -244,6 +246,8 @@ call_func_expr2 ::= list_arg R_PARENTHESIS_OP
   /*----------------------------------ARGUMENT LIST STATEMEN----------------------------------*/
 
   list_arg      ::= list_arg COMMA expr
+                    |
+                    list_arg error {:System.err.println(" Missing: , \n");:} expr
                     |
                     expr
                     ;
@@ -359,7 +363,7 @@ if_loop_stmt    ::= IF logic_expr COLON_OP list_loop_block_stmt SEMICOLON_OP
                     |
                     block_stmt
                     ;
-  list_loop_block_stmt ::= list_loop_block_stmt loop_block_stmt
+  list_loop_block_stmt::= list_loop_block_stmt loop_block_stmt
                             |
                             loop_block_stmt
                             ;
@@ -370,13 +374,13 @@ if_loop_stmt    ::= IF logic_expr COLON_OP list_loop_block_stmt SEMICOLON_OP
                     |
                     if_loop_stmt
                     |
-                    test
+                    base_block_stmt
 
                     ;
 
   block_stmt    ::= if_stmt
                     |
-                    test
+                    base_block_stmt
 
                     ;
 

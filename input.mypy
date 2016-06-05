@@ -14,7 +14,7 @@ def myFun():
     print ("a",1)
   ;
   elif a==0:
-    cl = input("ingrese")
+    f.e)
   ;
   else:
     a = mifuncion()
