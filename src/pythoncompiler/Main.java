@@ -13,7 +13,8 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- *
+ *2
+ * 
  * @author Cortes
  */
 public class Main {
@@ -74,7 +75,7 @@ public class Main {
                     /*  Ejecutamos el analizador lexico y sintactico
                      sobre un archivo de pruebas.
                      */
-                    String[] archivoPrueba = {"input.mypy"};
+                    String[] archivoPrueba = {"input.py"};
                     Parser.main(archivoPrueba);
                     System.out.println("Ejecutado!");
                     break;

@@ -177,10 +177,10 @@ INVALID_LITERAL         = {INVALID_STR_LIT} | {INVALID_CHAR_LIT} |{NUM_LIT}({EXP
     "is not"                { return symbol(sym.IS_NOT); }
     "or"                    { return symbol(sym.OR); }
     "print"                 { return symbol(sym.PRINT); }
-    "return"                { return symbol(sym.RETUNR); }
     "try"                   { return symbol(sym.TRY); }
     "while"                 { return symbol(sym.WHILE); }
     "range"                 { return symbol(sym.RANGE); }
+    "return"                { return symbol(sym.RETURN); }
     {TYPE_LIST}             { return symbol(sym.TYPE_LIST); }
     {TYPE_INT}              { return symbol(sym.TYPE_INT); }
     {TYPE_FLOAT}            { return symbol(sym.TYPE_FLOAT); }
@@ -194,6 +194,7 @@ INVALID_LITERAL         = {INVALID_STR_LIT} | {INVALID_CHAR_LIT} |{NUM_LIT}({EXP
     {COLON_OP}              { return symbol(sym.COLON_OP); }
     {IDENTIFIER}            { return symbol(sym.IDENTIFIER); }
     {COMMA}                 { return symbol(sym.COMMA); }
+    {BIT_OP}                { return symbol(sym.BIT_OP); }
 
 
 
