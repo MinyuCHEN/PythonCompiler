@@ -4,6 +4,7 @@ def cuentaAbajo(int n):
   ;
 
 a = input("Digite un numero")
+Ñ = r
 cuentaAbajo(a)
 ;
 

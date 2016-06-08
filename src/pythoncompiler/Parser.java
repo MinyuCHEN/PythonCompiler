@@ -846,8 +846,7 @@ public class Parser extends java_cup.runtime.lr_parser {
 
                       }if (s.sym == 3) {
                         m.append(" : Lexical error (INVALID ID)");
-                        lex_error.add(m);
-
+                        
                       }if (s.sym == 4){
                         m.append(" : Lexical error (INVALID TOKEN)");
 
