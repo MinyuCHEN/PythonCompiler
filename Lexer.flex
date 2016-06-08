@@ -82,7 +82,7 @@ ARITH_OP                = "+"|"-"|"*"|"/"|"%"|"**"|"//"
 COMP_OP                 = "=="|"!="|"<>"|">"|"<"|">="|"<="
 ASSIG_OP                = "="|"+="|"-="|"*="|"/="|"//="|"%="|"**="
 BIT_OP                  = "&"|"|"|"^"|"~"|"<<"|">>"
-LOGICAL_OP              = "AND"|"OR"|"NOT"
+LOGICAL_OP              = "AND"|"OR"|"NOT"|"and"|"or"|"not"
 MEMBERSHIP_OP           = "in"|"not in"
 IDENTITY_OP             = "is"|"is not"|"isn't"
 DELIMITER_OP            = "@"|">>="|"<<="|"&="|"|="
@@ -145,11 +145,11 @@ INVALID_LITERAL         = {INVALID_STR_LIT} | {INVALID_CHAR_LIT} |{NUM_LIT}({EXP
 
 <YYINITIAL> {
     {COMMENT} {/*IGNORE*/}
-    {TAB_OP}                { return symbol(sym.TAB_OP); }
+    {INVALID_CHARACTER}    { return symbol(sym.ERROR_CHA); }
+
     {WHITESPACE} {/*IGNORE*/}
 
-
-    {INVALID_CHARACTER}     { return symbol(sym.ERROR); }
+    {TAB_OP}                { return symbol(sym.TAB_OP); }
     {SEMICOLON_OP}          { return symbol(sym.SEMICOLON_OP); }
     {ARITH_OP}              { return symbol(sym.ARITH_OP); }
     {L_PARENTHESIS_OP}      { return symbol(sym.L_PARENTHESIS_OP); }
@@ -157,9 +157,9 @@ INVALID_LITERAL         = {INVALID_STR_LIT} | {INVALID_CHAR_LIT} |{NUM_LIT}({EXP
     {L_BRACKET_OP}          { return symbol(sym.L_BRACKET_OP); }
     {R_BRACKET_OP}          { return symbol(sym.R_BRACKET_OP); }
 
+    {CHAR_LIT}              { return symbol(sym.CHAR_LIT, new String(yytext())); }
     {NUM_LIT}               { return symbol(sym.NUM_LIT, new Integer(yytext())); }
     {STRING_LIT}            { return symbol(sym.STRING_LIT, new String(yytext())); }
-    {CHAR_LIT}              { return symbol(sym.CHAR_LIT, new String(yytext())); }
     {BOOLEAN_LIT}           { return symbol(sym.BOOLEAN_LIT, new Boolean(yytext())); }
     "and"                   { return symbol(sym.AND); }
     "break"                 { return symbol(sym.BREAK); }
@@ -175,7 +175,6 @@ INVALID_LITERAL         = {INVALID_STR_LIT} | {INVALID_CHAR_LIT} |{NUM_LIT}({EXP
     "in"                    { return symbol(sym.IN); }
     "input"                 { return symbol(sym.INPUT); }
     "is not"                { return symbol(sym.IS_NOT); }
-    "or"                    { return symbol(sym.OR); }
     "print"                 { return symbol(sym.PRINT); }
     "try"                   { return symbol(sym.TRY); }
     "while"                 { return symbol(sym.WHILE); }
@@ -196,10 +195,10 @@ INVALID_LITERAL         = {INVALID_STR_LIT} | {INVALID_CHAR_LIT} |{NUM_LIT}({EXP
     {COMMA}                 { return symbol(sym.COMMA); }
     {BIT_OP}                { return symbol(sym.BIT_OP); }
 
-
-
+    {INVALID_LITERAL}       { return symbol(sym.ERROR_LIT); }
+    {INVALID_IDENTIFIER}    { return symbol(sym.ERROR_ID); }
 
 }
-[^]                         { return symbol(sym.ERROR); }
+[^]                         { return symbol(sym.ERROR_INV); }
 
 

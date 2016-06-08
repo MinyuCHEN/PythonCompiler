@@ -1,14 +1,14 @@
-def cuentaAbajo(int a):
+def cuentaAbajo(int n):
     for a in range(2,7): # Todo correcto
         print(a)
   ;
 
+a = input("Digite un numero")
 cuentaAbajo(a)
 ;
 
 
 int x
-
 x=1
 for  in range(2,7): # Falta variable
   print(a)
