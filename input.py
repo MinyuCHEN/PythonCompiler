@@ -3,7 +3,7 @@ def cuentaAbajo(int n):
         print(a)
   ;
 
-a = input("Digite un numero")
+
 Ñ = r
 cuentaAbajo(a)
 ;
